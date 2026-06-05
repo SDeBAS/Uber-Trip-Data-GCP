@@ -1,132 +1,390 @@
-# GCP Data Engineering project
+# 🚖 Uber Trip Data Analytics on Google Cloud Platform
 
-The purpose of this project is to analyze the [TLC Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). Trip records include fields capturing pick-up and drop-off dates/times, pick-up and drop-off locations, trip distances, itemized fares, rate types, payment types, and driver-reported passenger counts. To understand the data and its fields, please refer to the data dictionary provided by the TLC (`data_dictionary_trip_records_yellow.pdf`). 
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white">
+  <img src="https://img.shields.io/badge/Google%20Cloud-4285F4?logo=googlecloud&logoColor=white">
+  <img src="https://img.shields.io/badge/Mage-AI-orange">
+  <img src="https://img.shields.io/badge/BigQuery-669DF6?logo=googlebigquery&logoColor=white">
+  <img src="https://img.shields.io/badge/Looker%20Studio-4285F4?logo=looker&logoColor=white">
+  <img src="https://img.shields.io/badge/Data%20Engineering-End--to--End-success">
+</p>
 
+<p align="center">
+  <strong>End-to-End Data Engineering Project using Google Cloud Platform, Mage, BigQuery, and Looker Studio for processing and analyzing NYC Taxi Trip Data.</strong>
+</p>
 
-The analysis of the TLC Trip Record Data will be conducted using the following technologies and tools:
+---
 
+## 📖 Project Overview
 
+This project demonstrates the implementation of a complete cloud-native data engineering pipeline on Google Cloud Platform (GCP).
 
+The pipeline extracts raw NYC Taxi & Limousine Commission (TLC) trip data, performs transformations using Mage, stores curated datasets in BigQuery, and generates business insights through Looker Studio dashboards.
 
-- Cloud Storage 🪣 to store and manage the trip record data
+The project was developed to gain hands-on experience with:
 
-- Compute Engine 💽 to host and run the Mage 
+- Cloud Data Engineering
+- ETL Pipeline Development
+- Data Warehousing
+- Data Modeling
+- Analytics Engineering
+- Dashboard Development
 
-- Mage 🧙‍♂️ for Extract, Transform, Load (ETL) processes
+---
 
-- BigQuery 🔍 as our data warehouse for storing and querying the transformed trip record data
+## 🎯 Business Problem
 
-- Looker📈 as our business intelligence and data visualization platform
+The NYC Taxi & Limousine Commission (TLC) publishes millions of taxi trip records containing detailed transportation information.
 
+These records include:
 
+- Pickup & Dropoff timestamps
+- Passenger counts
+- Trip distances
+- Fare details
+- Payment methods
+- Pickup and Dropoff locations
 
-    
-💡 Additionally, a key objective of this project is to gain familiarity with the Mage tool. Mage offers an alternative approach to Airflow for managing ETL workflows and will be the primary tool used to orchestrate the data pipeline.
+Raw transportation data is difficult to analyze directly.
 
+This project transforms raw trip records into an analytics-ready data warehouse that supports business intelligence and operational reporting.
 
+---
 
-![image](https://github.com/janaom/GCP-DE-project-uber-etl-pipeline/assets/83917694/6cada155-6df3-4497-8410-ab0d9f4d0b09)
+## 📊 Dataset
 
+The project uses publicly available TLC Taxi Trip Record Data.
 
+### Dataset Features
 
+✅ Pickup & Dropoff DateTime
 
-# GCS 🪣
+✅ Passenger Count
 
-Create a new bucket, upload the csv file. Change the permissions of the bucket (permissions -> edit access control -> Fine-grained), edit the access of the csv file to make it publicly available
+✅ Trip Distance
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/66511ae3-9543-4d96-b6d9-22f8a6ac1483)
+✅ Fare Amount
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/38b135a9-1b16-4e15-b082-0aecc5942c30)
+✅ Payment Type
 
+✅ Vendor Information
 
-# Compute Engine 💽
+✅ Location IDs
 
-Create a new instance, e.g. Machine type: e2-standard-4
+### Data Source
 
-SSH into your VM and run these commands to install Python, pip, wget, pandas, Google Cloud Library, Google Cloud BigQuery library 
+https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 
-`sudo apt-get install update`
+### Data Dictionary
 
-`sudo apt-get install python3-distutils`
+See:
 
-`sudo apt-get install python3-apt`
+```text
+data_dictionary_trip_records_yellow.pdf
+```
 
-`sudo apt-get install wget`
+included in this repository.
 
-`wget https://bootstrap.pypa.io/get-pip.py`
+---
 
-`sudo python3 get-pip.py`
+# 🏗️ Architecture
 
-`sudo pip3 install pandas`
+The pipeline follows a modern cloud data engineering architecture.
 
-`sudo pip3 install google-cloud`
+![Architecture Diagram](GCP_diagram.jpg)
 
-`sudo pip3 install google-cloud-bigquery`
+### Workflow
 
+```text
+Raw TLC Dataset
+        │
+        ▼
+Google Cloud Storage
+        │
+        ▼
+Mage ETL Pipeline
+        │
+        ▼
+BigQuery Data Warehouse
+        │
+        ▼
+Looker Studio Dashboard
+```
 
-Run `sudo pip3 install mage-ai` to install [Mage](https://github.com/mage-ai/mage-ai#%EF%B8%8F-install) on your VM.
+---
 
-To start a new Mage project: `mage start de-uber-project` (you will see: `Checking port 6789...` if you restart Mage, the port may change e.g. `Checking port 6790...`)
+# 🧩 Data Model
 
-Create a new firewall rule for the port 6789
+A dimensional data model was designed to support efficient analytics and reporting.
 
-<img width="700" alt="image" src="https://github.com/janaom/GCP-DE-project-uber-etl-pipeline/assets/83917694/5e2344e7-69d4-4e11-aa89-d9ed23888e1f">
+![Data Model](Data_model_diagram.jpeg)
 
+The model consists of:
 
-To open Mage UI: `External-IP-address:6789`
+### Fact Table
 
+- Trip Fact
 
-# Mage 🧙
+### Dimension Tables
 
-## load_uber_data
+- Datetime Dimension
+- Passenger Count Dimension
+- Rate Code Dimension
+- Payment Type Dimension
+- Pickup Location Dimension
+- Dropoff Location Dimension
 
-Open Mage UI, select `Data loader -> Python -> API`
+This structure improves query performance and enables scalable reporting.
 
-Copy URL of your csv file, add it to the Mage code: @data_loader url = ' '
+---
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/9d125cee-63f2-4802-a7a4-b75f0be9bc63)
+# ⚙️ Technology Stack
 
-Run the block, load the data from GCS
+## Programming
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/e5e01438-4a74-4e12-b0bc-f037f6b42d74)
+- Python
+- SQL
 
-## uber_transformation
+## Cloud Platform
 
-Transform the data: select `Transformer -> Python -> Generic (no template)`
+- Google Cloud Platform (GCP)
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/39995cd8-b34d-42b7-b605-566e5b4efbbb)
+## Services Used
 
-Run uber_transformation block
+### ☁️ Google Cloud Storage
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/76893241-b06a-4862-ae7a-1bdf22a85859)
+Used as the Data Lake for storing raw taxi trip datasets.
 
-## uber_bigquery_load
+### 💻 Google Compute Engine
 
-Select `Data exporter -> Python -> Google BigQuery`
+Used to host Mage and execute ETL workloads.
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/c714ee7d-5de3-4e8a-b83e-40e12c1ebd0f)
+### 🔄 Mage
 
-Go to API & Services on GCP, create a new Service account from the Credentials section, assign the BigQuery Admin role to the SA. Create a new key in JSON format for this SA.
-Copy and paste the information from your JSON key into the `io_config.yaml` file.
+Used for:
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/27f5b21a-769c-47ea-b03a-89cb20cec313)
+- Data Extraction
+- Data Transformation
+- Pipeline Orchestration
+- Workflow Automation
 
+### 📊 BigQuery
 
-# BigQuery 🔍
+Used as the enterprise-scale cloud data warehouse.
 
-Create a Dataset in BQ, run uber_bigquery_load block. Load all tables to BQ.
+### 📈 Looker Studio
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/829677c2-d407-4726-830a-a1d86ceea3d6)
+Used for dashboarding and business intelligence.
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/91b1924e-412b-471d-ae28-4d8b0769cfee)
+---
 
-![image](https://github.com/janaom/GCP_DE_project_uber_etl_pipeline/assets/83917694/b265a460-45fa-423a-b5ee-50cc6277a293)
+# 📂 Repository Structure
 
-Create a new table by running sql code from `sql_query.sql`
+```text
+Uber-Trip-Data-GCP/
+│
+├── data/
+│   └── Source datasets
+│
+├── mage-files/
+│   └── Mage ETL pipelines
+│
+├── Uber-Data-Analytics.ipynb
+│
+├── analytics_query.sql
+│
+├── commands.txt
+│
+├── GCP_diagram.jpg
+│
+├── Data_model_diagram.jpeg
+│
+├── Uber_Dashboard.pdf
+│
+├── data_dictionary_trip_records_yellow.pdf
+│
+└── README.md
+```
 
+---
 
-# Looker 📈
+# 🔄 ETL Pipeline
 
-Open lookerstudio.google.com. Connect Looker to your BQ.
+## Step 1: Data Ingestion
 
-Create a dashboard. Here is an example of my [Looker Dashboard](https://lookerstudio.google.com/s/twWLPhtdgPI).
+Raw TLC trip records are uploaded into Google Cloud Storage.
+
+### Source Layer
+
+```text
+GCS Bucket
+```
+
+stores raw CSV datasets.
+
+---
+
+## Step 2: Data Transformation
+
+Mage extracts data from Cloud Storage and performs:
+
+- Data Cleaning
+- Type Conversion
+- Null Handling
+- Feature Engineering
+- Schema Standardization
+
+Pipeline code can be found in:
+
+```text
+mage-files/
+```
+
+---
+
+## Step 3: Data Warehouse Loading
+
+The transformed datasets are loaded into:
+
+```text
+Google BigQuery
+```
+
+for analytical processing.
+
+---
+
+## Step 4: Analytics Layer
+
+Business metrics and KPIs are generated using SQL.
+
+Query file:
+
+```text
+analytics_query.sql
+```
+
+---
+
+## Step 5: Dashboarding
+
+Looker Studio connects directly to BigQuery and visualizes:
+
+- Revenue Trends
+- Trip Distribution
+- Passenger Analysis
+- Payment Method Analysis
+- Distance Metrics
+
+---
+
+# 📈 Dashboard
+
+The final dashboard was created using Looker Studio.
+
+Dashboard export:
+
+```text
+Uber_Dashboard.pdf
+```
+
+### Dashboard Insights
+
+- Total Trips
+- Revenue Trends
+- Passenger Behavior
+- Payment Method Distribution
+- Distance Analysis
+- Time-Based Trip Patterns
+
+---
+
+# 📓 Analytics Notebook
+
+Additional exploratory analysis and validation were performed in:
+
+```text
+Uber-Data-Analytics.ipynb
+```
+
+This notebook includes:
+
+- Data Exploration
+- Statistical Analysis
+- Data Validation
+- Visualization
+
+---
+
+# 🚀 Setup Instructions
+
+## Clone Repository
+
+```bash
+git clone https://github.com/SDeBAS/Uber-Trip-Data-GCP.git
+```
+
+## Navigate to Repository
+
+```bash
+cd Uber-Trip-Data-GCP
+```
+
+## Install Mage
+
+```bash
+pip install mage-ai
+```
+
+## Configure GCP
+
+1. Create GCS Bucket
+2. Upload Dataset
+3. Create BigQuery Dataset
+4. Configure Service Account
+5. Update Mage Configuration
+
+---
+
+# 🎓 Key Learnings
+
+This project helped develop practical skills in:
+
+- Data Engineering
+- Cloud Computing
+- ETL Development
+- Data Modeling
+- BigQuery
+- SQL Optimization
+- Workflow Orchestration
+- Dashboard Development
+- Google Cloud Platform
+
+---
+
+# 🔮 Future Enhancements
+
+- Apache Airflow Integration
+- Real-Time Streaming Pipelines
+- Data Quality Framework
+- Terraform Deployment
+- CI/CD Automation
+- Incremental Data Processing
+- BigQuery Partitioning
+- Machine Learning Integration
+
+---
+
+# 👨‍💻 Author
+
+## Debanjan Basu
+
+**Data Engineer | BI Developer | Cloud & Analytics Enthusiast**
+
+GitHub: https://github.com/SDeBAS
+
+---
+
+# ⭐ Support
+
+If you found this project useful, consider giving it a ⭐ on GitHub.
